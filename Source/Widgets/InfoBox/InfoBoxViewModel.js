@@ -54,6 +54,13 @@ define([
         this.titleText = '';
 
         /**
+         * Gets or sets the description function for the info box.
+         * @type {String}
+         */
+
+        this.descriptionFunction = undefined;
+
+        /**
          * Gets or sets the description HTML for the info box.
          * @type {String}
          */

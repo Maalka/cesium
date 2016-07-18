@@ -87,6 +87,26 @@ click: function () { closeClicked.raiseEvent(this); }');
         this._viewModel = viewModel;
         this._descriptionSubscription = undefined;
 
+        //Returns true if it is a DOM node
+        function isNode(o){
+          return (
+            typeof Node === "object" ? o instanceof Node : 
+            o && typeof o === "object" && typeof o.nodeType === "number" && typeof o.nodeName==="string"
+          );
+        }
+
+        //Returns true if it is a DOM element    
+        function isElement(o){
+          return (
+            typeof HTMLElement === "object" ? o instanceof HTMLElement : //DOM2
+            o && typeof o === "object" && o !== null && o.nodeType === 1 && typeof o.nodeName==="string"
+            );
+        }
+        function isFunction(functionToCheck) {
+            var getType = {};
+             return functionToCheck && getType.toString.call(functionToCheck) === '[object Function]';
+        }
+
         var that = this;
         //We can't actually add anything into the frame until the load event is fired
         frame.addEventListener('load', function() {
@@ -98,6 +118,12 @@ click: function () { closeClicked.raiseEvent(this); }');
             cssLink.href = buildModuleUrl('Widgets/InfoBox/InfoBoxDescription.css');
             cssLink.rel = "stylesheet";
             cssLink.type = "text/css";
+
+            // Inject the semantic-ui css into the iframe
+            var cssLink = frameDocument.createElement("link");
+            cssLink.href = "/services/assets/javascripts/semantic-ui/dist/semantic.min.css";
+            cssLink.rel = "stylesheet";
+            cssLink.type = "text/css";   
 
             //div to use for description content.
             var frameContent = frameDocument.createElement("div");
@@ -113,7 +139,21 @@ click: function () { closeClicked.raiseEvent(this); }');
             that._descriptionSubscription = subscribeAndEvaluate(viewModel, 'description', function(value) {
                 // Set the frame to small height, force vertical scroll bar to appear, and text to wrap accordingly.
                 frame.style.height = '5px';
-                frameContent.innerHTML = value;
+                if (isFunction(viewModel.descriptionFunction)) { 
+                    value = viewModel.descriptionFunction();
+                }
+                if (isNode(value)) { 
+                    if (frameContent.firstChild === value) { 
+                        return;
+                    }
+                    while (frameContent.firstChild) {
+                        frameContent.removeChild(frameContent.firstChild);
+                    }
+                    frameContent.appendChild(value);
+                } else {
+                    frameContent.innerHTML = value;
+                }
+                console.log(value);
 
                 //If the snippet is a single element, then use its background
                 //color for the body of the InfoBox. This makes the padding match

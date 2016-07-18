@@ -1517,6 +1517,7 @@ Either specify options.terrainProvider instead or set options.baseLayerPicker to
 
             if (showSelection) {
                 infoBoxViewModel.titleText = defaultValue(selectedEntity.name, selectedEntity.id);
+                infoBoxViewModel.descriptionFunction = selectedEntity.descriptionFunction;
                 infoBoxViewModel.description = Property.getValueOrDefault(selectedEntity.description, time, '');
             } else {
                 infoBoxViewModel.titleText = '';
